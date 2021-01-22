@@ -5,8 +5,8 @@ const url = process.env.MONGODB_URI
 
 console.log('connecting to ', url)
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true})
-	.then(result => {
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+	.then( () => {
 		console.log('connected to mongoDB')
 	})
 	.catch((error) => {
@@ -15,8 +15,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true})
 
 const personSchema = new mongoose.Schema({
     name: {
-        type: String, 
-        required: true, 
+        type: String,
+        required: true,
         unique: true,
         minlength: 3,
     },
@@ -25,13 +25,15 @@ const personSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v) {
-                const num = v.replace(/\D/g, "")
+                const num = v.replace(/\D/g, '')
                 return num.length >= 8
             },
             message: props => `${props.value} is an invalid phone number, has less than 8 digits.`
         }
     }
 })
+
+personSchema.plugin(uniqueValidator)
 
 personSchema.set('toJSON', {
 	transform: (document, returnedObject) => {
