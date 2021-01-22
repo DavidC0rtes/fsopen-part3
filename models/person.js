@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const url = process.env.MONGODB_URI
 
@@ -13,8 +14,23 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true})
 	})
 
 const personSchema = new mongoose.Schema({
-	name: String,
-	number: String,
+    name: {
+        type: String, 
+        required: true, 
+        unique: true,
+        minlength: 3,
+    },
+	number: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function(v) {
+                const num = v.replace(/\D/g, "")
+                return num.length >= 8
+            },
+            message: props => `${props.value} is an invalid phone number, has less than 8 digits.`
+        }
+    }
 })
 
 personSchema.set('toJSON', {
